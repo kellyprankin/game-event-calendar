@@ -9,11 +9,12 @@ const templates = ref<GameTemplate[]>([])
 const name = ref('')
 const templateId = ref('')
 const format = ref('')
-const startsAt = ref(toLocalInput(tomorrowAt(18)))
-// Greys out past days in the picker. Midnight rather than "now": the picker disables a day when
-// that day at the currently entered time is before min, which would block later times today.
-// submit() and the API still reject past times, since typed values bypass the picker anyway.
-const minStartsAt = toLocalInput(startOfToday())
+// Separate date and time inputs: a date-only picker with min=today reliably allows today,
+// while datetime-local pickers grey today out depending on the entered time. submit() and the
+// API still reject start times that have already passed.
+const date = ref(toDateInput(tomorrow()))
+const time = ref('18:00')
+const minDate = toDateInput(new Date())
 const capacity = ref<number | null>(null)
 
 const submitting = ref(false)
@@ -40,7 +41,8 @@ watch(template, (t) => {
 async function submit() {
   error.value = ''
   fieldErrors.value = {}
-  const start = new Date(startsAt.value)
+  // "YYYY-MM-DDTHH:mm" with no zone parses as local time.
+  const start = new Date(`${date.value}T${time.value}`)
   if (Number.isNaN(start.getTime()) || start <= new Date()) {
     error.value = 'Please fix the highlighted fields.'
     fieldErrors.value = {
@@ -78,23 +80,16 @@ function fieldError(field: string) {
   return key ? fieldErrors.value[key]?.join(' ') : undefined
 }
 
-function startOfToday() {
-  const d = new Date()
-  d.setHours(0, 0, 0, 0)
-  return d
-}
-
-function tomorrowAt(hour: number) {
+function tomorrow() {
   const d = new Date()
   d.setDate(d.getDate() + 1)
-  d.setHours(hour, 0, 0, 0)
   return d
 }
 
-// <input type="datetime-local"> wants local "YYYY-MM-DDTHH:mm" with no zone.
-function toLocalInput(d: Date) {
+// <input type="date"> wants the local date as "YYYY-MM-DD".
+function toDateInput(d: Date) {
   const pad = (n: number) => String(n).padStart(2, '0')
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 </script>
 
@@ -130,21 +125,33 @@ function toLocalInput(d: Date) {
       <span v-if="fieldError('format')" id="format-error" class="error">{{ fieldError('format') }}</span>
     </label>
 
-    <label>
-      Date and start time
-      <input
-        v-model="startsAt"
-        type="datetime-local"
-        :min="minStartsAt"
-        required
-        :aria-invalid="!!fieldError('startsAt')"
-        aria-describedby="starts-hint starts-error"
-      />
+    <div class="when">
+      <label>
+        Date
+        <input
+          v-model="date"
+          type="date"
+          :min="minDate"
+          required
+          :aria-invalid="!!fieldError('startsAt')"
+          aria-describedby="starts-error"
+        />
+      </label>
+      <label>
+        Start time
+        <input
+          v-model="time"
+          type="time"
+          required
+          :aria-invalid="!!fieldError('startsAt')"
+          aria-describedby="starts-hint starts-error"
+        />
+      </label>
       <span v-if="template" id="starts-hint" class="hint">
         {{ template.name }} events run {{ template.defaultDurationMinutes / 60 }} hours.
       </span>
       <span v-if="fieldError('startsAt')" id="starts-error" class="error">{{ fieldError('startsAt') }}</span>
-    </label>
+    </div>
 
     <label>
       Player capacity
@@ -172,3 +179,15 @@ function toLocalInput(d: Date) {
     </div>
   </form>
 </template>
+
+<style scoped>
+.when {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.25rem 1rem;
+}
+.when .hint,
+.when .error {
+  grid-column: 1 / -1;
+}
+</style>
