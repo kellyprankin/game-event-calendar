@@ -4,6 +4,7 @@ Decisions and trade-offs behind this project; the README's design write-up summa
 
 ## Capacity
 - Capacity is copied onto each event from its template at creation, then enforced in two places: an atomic seat claim in `RegistrationService` (`RegisteredCount + 1 WHERE RegisteredCount < Capacity`) and a database check constraint (`RegisteredCount <= Capacity`) as a backstop.
+- Proof: `RegistrationTests` fires 50 simultaneous registrations at a 30-seat event against real Postgres (Testcontainers) and asserts exactly 30 succeed. To check the test has teeth, the seat claim was temporarily swapped for a naive count-then-insert: all 50 registrations succeeded and the test failed (expected 30, actual 50).
 - Duplicates: unique index on (event, normalized name). A duplicate rolls back the seat claim so no seat is wasted. A real system would key on an account or email, since names aren't unique.
 
 ## Storage: Postgres instead of in-memory

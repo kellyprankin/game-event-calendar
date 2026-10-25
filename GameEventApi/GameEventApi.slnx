@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="GameEventApi.Tests/GameEventApi.Tests.csproj" />
   <Project Path="GameEventApi/GameEventApi.csproj" />
 </Solution>
