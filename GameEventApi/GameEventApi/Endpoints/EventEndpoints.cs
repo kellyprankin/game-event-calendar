@@ -1,6 +1,7 @@
 using GameEventApi.Contracts;
 using GameEventApi.Data;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameEventApi.Endpoints;
 
@@ -10,9 +11,30 @@ public static class EventEndpoints
     {
         var events = api.MapGroup("/events").WithTags("Events");
 
+        events.MapGet("/", ListEvents);
+        events.MapGet("/{id:guid}", GetEvent);
         events.MapPost("/", CreateEvent);
 
         return api;
+    }
+
+    // Both bounds are optional so the calendar can ask for a day, a month, or everything.
+    static async Task<Ok<List<EventDto>>> ListEvents(
+        DateTimeOffset? from, DateTimeOffset? to, AppDbContext db, CancellationToken ct)
+    {
+        var query = db.Events.AsNoTracking().Include(e => e.GameTemplate).AsQueryable();
+        if (from is { } f) query = query.Where(e => e.StartsAtUtc >= f.UtcDateTime);
+        if (to is { } t) query = query.Where(e => e.StartsAtUtc < t.UtcDateTime);
+
+        var events = await query.OrderBy(e => e.StartsAtUtc).ToListAsync(ct);
+        return TypedResults.Ok(events.Select(e => EventDto.From(e, e.GameTemplate!)).ToList());
+    }
+
+    static async Task<Results<Ok<EventDto>, NotFound>> GetEvent(Guid id, AppDbContext db, CancellationToken ct)
+    {
+        var ev = await db.Events.AsNoTracking().Include(e => e.GameTemplate)
+            .FirstOrDefaultAsync(e => e.Id == id, ct);
+        return ev is null ? TypedResults.NotFound() : TypedResults.Ok(EventDto.From(ev, ev.GameTemplate!));
     }
 
     static async Task<Results<Created<EventDto>, ValidationProblem>> CreateEvent(
