@@ -10,8 +10,10 @@ const name = ref('')
 const templateId = ref('')
 const format = ref('')
 const startsAt = ref(toLocalInput(tomorrowAt(18)))
-// Greys out past dates in the picker; submit() and the API still check, since typed values bypass it.
-const minStartsAt = toLocalInput(new Date())
+// Greys out past days in the picker. Midnight rather than "now": the picker disables a day when
+// that day at the currently entered time is before min, which would block later times today.
+// submit() and the API still reject past times, since typed values bypass the picker anyway.
+const minStartsAt = toLocalInput(startOfToday())
 const capacity = ref<number | null>(null)
 
 const submitting = ref(false)
@@ -74,6 +76,12 @@ async function submit() {
 function fieldError(field: string) {
   const key = Object.keys(fieldErrors.value).find((k) => k.toLowerCase() === field.toLowerCase())
   return key ? fieldErrors.value[key]?.join(' ') : undefined
+}
+
+function startOfToday() {
+  const d = new Date()
+  d.setHours(0, 0, 0, 0)
+  return d
 }
 
 function tomorrowAt(hour: number) {
