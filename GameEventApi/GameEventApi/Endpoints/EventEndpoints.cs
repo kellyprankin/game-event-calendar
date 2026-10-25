@@ -1,7 +1,10 @@
 using GameEventApi.Contracts;
+using System.Text;
 using GameEventApi.Data;
+using GameEventApi.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace GameEventApi.Endpoints;
 
@@ -14,8 +17,29 @@ public static class EventEndpoints
         events.MapGet("/", ListEvents);
         events.MapGet("/{id:guid}", GetEvent);
         events.MapPost("/", CreateEvent);
+        events.MapGet("/{id:guid}/invite.ics", GetInvite);
 
         return api;
+    }
+
+    static async Task<Results<FileContentHttpResult, NotFound>> GetInvite(
+        Guid id, AppDbContext db, IOptions<StoreOptions> store, TimeProvider clock, CancellationToken ct)
+    {
+        var ev = await db.Events.AsNoTracking().Include(e => e.GameTemplate)
+            .FirstOrDefaultAsync(e => e.Id == id, ct);
+        if (ev is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        var ics = CalendarInvite.Create(ev, ev.GameTemplate!, store.Value, clock.GetUtcNow().UtcDateTime);
+        return TypedResults.File(Encoding.UTF8.GetBytes(ics), "text/calendar", $"{FileName(ev.Name)}.ics");
+    }
+
+    static string FileName(string name)
+    {
+        var safe = new string(name.Select(c => char.IsLetterOrDigit(c) ? c : '-').ToArray()).Trim('-');
+        return string.IsNullOrEmpty(safe) ? "event" : safe;
     }
 
     // Both bounds are optional so the calendar can ask for a day, a month, or everything.
