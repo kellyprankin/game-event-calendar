@@ -40,6 +40,17 @@ public static class SeedData
             MaxCapacity = 24,
             MinPlayers = 4,
         },
+        // Not a card game: shows the template system isn't card-specific.
+        new()
+        {
+            Id = "dnd",
+            Name = "Dungeons & Dragons",
+            Formats = ["One-shot", "Campaign session", "Intro adventure"],
+            DefaultDurationMinutes = 240,
+            DefaultCapacity = 6,
+            MaxCapacity = 7,
+            MinPlayers = 3,
+        },
     ];
 
     // Inserts missing templates only, so edits made to existing rows are kept.
