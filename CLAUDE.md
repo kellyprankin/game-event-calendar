@@ -13,6 +13,8 @@ Take-home exercise: a small app for a game store to schedule tabletop game event
 - Start Postgres only: `docker compose up -d db`
 - Run API: `dotnet run --project GameEventApi/GameEventApi`
 - Add migration: `dotnet ef migrations add <Name> --project GameEventApi/GameEventApi` (uses the local tool in `dotnet-tools.json`; run `dotnet tool restore` first)
+- Frontend dev server: `cd web && npm run dev` (proxies /api to the API on :5198)
+- Frontend build into API wwwroot: `cd web && npm run build`
 - Whole app: `docker compose up --build`
 
 ## Conventions
