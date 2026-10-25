@@ -29,3 +29,4 @@ Decisions and trade-offs behind this project; the README's design write-up summa
 ## Other choices
 - REST over GraphQL for the timebox; `.ics` and QR images are natural REST resources. In GraphQL the schema would be `Event`, `GameTemplate`, and a `registerForEvent` mutation returning `Registration | EventFullError | DuplicateRegistrationError`.
 - Minimal APIs organized into route-group extension classes, matching the "small focused services" direction in the job description.
+- Native `date`/`time` inputs instead of a calendar library: accessible by default and no extra dependency. The trade-off is that each browser draws its own picker (Edge, for example, shades today and colors weekends red), so the look varies by browser. Past days are greyed out via `min`; the form and the API still reject start times that have passed.
