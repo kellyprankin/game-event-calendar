@@ -30,3 +30,13 @@ Decisions and trade-offs behind this project; the README's design write-up summa
 - REST over GraphQL for the timebox; `.ics` and QR images are natural REST resources. In GraphQL the schema would be `Event`, `GameTemplate`, and a `registerForEvent` mutation returning `Registration | EventFullError | DuplicateRegistrationError`.
 - Minimal APIs organized into route-group extension classes, matching the "small focused services" direction in the job description.
 - Native `date`/`time` inputs instead of a calendar library: accessible by default and no extra dependency. The trade-off is that each browser draws its own picker (Edge, for example, shades today and colors weekends red), so the look varies by browser. Past days are greyed out via `min`; the form and the API still reject start times that have passed.
+
+## Security
+Reviewed once the app was feature-complete.
+- **Checked and fine:** no vulnerable NuGet or npm packages; EF Core parameterizes all queries; Ical.Net escapes event text (a name containing line breaks and a fake `ATTENDEE:` line stayed inside `SUMMARY`); Vue escapes rendered text and nothing uses `v-html`; `.ics` download names are reduced to letters and digits; no endpoint returns registrant names; production returns generic ProblemDetails with no stack traces; the container runs as a non-root user; input lengths are capped in the API and the database.
+- **Fixed:** Postgres was published on all interfaces with the public dev password; it now binds to `127.0.0.1` only.
+- **Known limits, not fixed:**
+  - **No abuse protection.** With no auth, anyone can create events or fill one with fake names. Next step: ASP.NET's built-in rate limiter on create and register (partitioned so the concurrency test still runs), then real player identity.
+  - **Registration links trust the Host header** when `PUBLIC_BASE_URL` is unset. A spoofed Host only changes the requester's own response, but behind a shared cache it could poison the QR code for others. Set `PUBLIC_BASE_URL` (and `AllowedHosts`) in any real deployment.
+  - **Duplicate check reveals names.** "Already registered" confirms a given name signed up for an event. Minor with name-only registration; goes away with accounts.
+  - **No HTTPS.** Fine locally; a deployment would terminate TLS in front of the app.

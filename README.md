@@ -84,6 +84,7 @@ The seeded games are Magic: The Gathering plus two other card games with Wizards
 - **Store details are placeholders** in `appsettings.json`. Times are entered and displayed in the browser's time zone, stored in UTC, and written to `.ics` files in UTC.
 - **REST, not GraphQL.** The QR image and `.ics` download are natural REST resources. In GraphQL this would be `Event` and `GameTemplate` types and a `registerForEvent` mutation returning `Registration | EventFullError | DuplicateRegistrationError`.
 - **Frontend tests.** Only the API is tested; the UI was checked by hand.
+- **No abuse protection or HTTPS.** Without auth, anyone can create events or fill one with fake names; rate limiting is the next step. Set `PUBLIC_BASE_URL` in any real deployment so registration links don't trust the request's Host header. Security review notes are in [`docs/DESIGN_NOTES.md`](docs/DESIGN_NOTES.md#security).
 
 **Next:** player accounts or email-based registration (which also enables confirmation and unregistering), a waitlist that promotes people when seats open, an organizer view of registrants, the `GameFormat` table, a configured store time zone, and a month grid.
 
