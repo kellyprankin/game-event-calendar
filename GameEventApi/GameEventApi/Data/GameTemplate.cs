@@ -13,4 +13,7 @@ public class GameTemplate
     public int DefaultCapacity { get; set; }
     public int MaxCapacity { get; set; }
     public int MinPlayers { get; set; }
+
+    // Position in pickers and lists; lower comes first.
+    public int DisplayOrder { get; set; }
 }

@@ -17,7 +17,9 @@ public static class TemplateEndpoints
 
     static async Task<Ok<List<TemplateDto>>> ListTemplates(AppDbContext db, CancellationToken ct)
     {
-        var templates = await db.GameTemplates.AsNoTracking().OrderBy(t => t.Name).ToListAsync(ct);
+        var templates = await db.GameTemplates.AsNoTracking()
+            .OrderBy(t => t.DisplayOrder).ThenBy(t => t.Name)
+            .ToListAsync(ct);
         return TypedResults.Ok(templates.Select(TemplateDto.From).ToList());
     }
 }

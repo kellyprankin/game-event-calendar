@@ -19,6 +19,7 @@ public static class SeedData
             DefaultCapacity = 16,
             MaxCapacity = 30,
             MinPlayers = 8,
+            DisplayOrder = 1,
         },
         new()
         {
@@ -29,6 +30,7 @@ public static class SeedData
             DefaultCapacity = 15,
             MaxCapacity = 30,
             MinPlayers = 4,
+            DisplayOrder = 2,
         },
         new()
         {
@@ -39,6 +41,7 @@ public static class SeedData
             DefaultCapacity = 12,
             MaxCapacity = 24,
             MinPlayers = 4,
+            DisplayOrder = 3,
         },
         // Not a card game: shows the template system isn't card-specific.
         new()
@@ -50,6 +53,7 @@ public static class SeedData
             DefaultCapacity = 6,
             MaxCapacity = 7,
             MinPlayers = 3,
+            DisplayOrder = 4,
         },
     ];
 

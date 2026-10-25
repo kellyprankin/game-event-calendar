@@ -85,6 +85,9 @@ namespace GameEventApi.Migrations
                     b.Property<int>("DefaultDurationMinutes")
                         .HasColumnType("integer");
 
+                    b.Property<int>("DisplayOrder")
+                        .HasColumnType("integer");
+
                     b.PrimitiveCollection<List<string>>("Formats")
                         .IsRequired()
                         .HasColumnType("text[]");
