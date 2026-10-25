@@ -15,7 +15,7 @@ Timebox: 3 hours. Each step ends in a working state and gets its own commit, so 
    - **GameTemplate:** name, formats, default duration, default and max capacity, minimum players.
    - **Event:** copies duration and capacity from its template at creation; tracks the registered count.
    - **Registration:** one row per player.
-6. Seed three games (Magic: The Gathering, Pokémon TCG, Lorcana), add a unique index on event + normalized name, and create the first migration. Apply migrations at startup so `docker compose up` is enough.
+6. Seed three card games (Magic: The Gathering, Vampire: The Eternal Struggle, Netrunner), add a unique index on event + normalized name, and create the first migration. Apply migrations at startup so `docker compose up` is enough.
 
 ## Phase 2: API (~60 min)
 7. List templates; create event with server-side checks (format must belong to the template, capacity can't exceed its max).
