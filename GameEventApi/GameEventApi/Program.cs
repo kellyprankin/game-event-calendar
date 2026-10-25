@@ -1,5 +1,6 @@
 using GameEventApi.Data;
 using GameEventApi.Endpoints;
+using GameEventApi.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +9,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddValidation();
 builder.Services.AddProblemDetails();
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<RegistrationService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))
         .UseSeeding((db, _) => SeedData.SeedTemplates(db))
@@ -31,5 +33,6 @@ app.UseHttpsRedirection();
 var api = app.MapGroup("/api");
 api.MapTemplateEndpoints();
 api.MapEventEndpoints();
+api.MapRegistrationEndpoints();
 
 app.Run();
