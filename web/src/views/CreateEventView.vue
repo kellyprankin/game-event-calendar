@@ -34,16 +34,24 @@ watch(template, (t) => {
 })
 
 async function submit() {
-  submitting.value = true
   error.value = ''
   fieldErrors.value = {}
+  const start = new Date(startsAt.value)
+  if (Number.isNaN(start.getTime())) {
+    error.value = 'Please fix the highlighted fields.'
+    fieldErrors.value = { StartsAt: ['Choose a date and start time.'] }
+    return
+  }
+
+  submitting.value = true
   try {
     const created = await api.createEvent({
       name: name.value,
       gameTemplateId: templateId.value,
       format: format.value,
-      startsAt: new Date(startsAt.value).toISOString(),
-      capacity: capacity.value,
+      startsAt: start.toISOString(),
+      // A cleared number input yields "", which means "use the game's default".
+      capacity: typeof capacity.value === 'number' ? capacity.value : null,
     })
     await router.push(`/events/${created.id}`)
   } catch (e) {
