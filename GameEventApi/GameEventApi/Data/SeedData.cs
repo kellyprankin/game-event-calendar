@@ -1,0 +1,61 @@
+using Microsoft.EntityFrameworkCore;
+
+namespace GameEventApi.Data;
+
+/// <summary>
+/// Game templates inserted on startup. Adding a game means adding an entry here
+/// (or a row in the table); no event logic changes.
+/// </summary>
+public static class SeedData
+{
+    public static GameTemplate[] Templates =>
+    [
+        new()
+        {
+            Id = "mtg",
+            Name = "Magic: The Gathering",
+            Formats = ["Standard", "Pioneer", "Modern", "Commander", "Draft"],
+            DefaultDurationMinutes = 240,
+            DefaultCapacity = 16,
+            MaxCapacity = 30,
+            MinPlayers = 8,
+        },
+        new()
+        {
+            Id = "pokemon",
+            Name = "Pokémon TCG",
+            Formats = ["Standard", "Expanded"],
+            DefaultDurationMinutes = 180,
+            DefaultCapacity = 16,
+            MaxCapacity = 30,
+            MinPlayers = 4,
+        },
+        new()
+        {
+            Id = "lorcana",
+            Name = "Disney Lorcana",
+            Formats = ["Core Constructed", "Infinity Constructed", "Sealed"],
+            DefaultDurationMinutes = 180,
+            DefaultCapacity = 12,
+            MaxCapacity = 24,
+            MinPlayers = 4,
+        },
+    ];
+
+    // Inserts missing templates only, so edits made to existing rows are kept.
+    public static async Task SeedTemplatesAsync(DbContext db, CancellationToken ct = default)
+    {
+        var templates = db.Set<GameTemplate>();
+        var existing = await templates.Select(t => t.Id).ToListAsync(ct);
+        templates.AddRange(Templates.Where(t => !existing.Contains(t.Id)));
+        await db.SaveChangesAsync(ct);
+    }
+
+    public static void SeedTemplates(DbContext db)
+    {
+        var templates = db.Set<GameTemplate>();
+        var existing = templates.Select(t => t.Id).ToList();
+        templates.AddRange(Templates.Where(t => !existing.Contains(t.Id)));
+        db.SaveChanges();
+    }
+}
