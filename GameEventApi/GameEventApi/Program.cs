@@ -32,10 +32,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
 
 var api = app.MapGroup("/api");
 api.MapTemplateEndpoints();
 api.MapEventEndpoints();
 api.MapRegistrationEndpoints();
+
+// Unknown /api paths stay 404s; any other path loads the Vue app, which handles routing.
+api.MapFallback(() => TypedResults.NotFound());
+app.MapFallbackToFile("index.html");
 
 app.Run();

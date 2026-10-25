@@ -483,3 +483,6 @@ $RECYCLE.BIN/
 
 # Take-home instructions (kept local, not published)
 Senior_Software_Engineer_*Take-Home.md
+
+# Built Vue app (output of web/ npm run build)
+GameEventApi/GameEventApi/wwwroot/

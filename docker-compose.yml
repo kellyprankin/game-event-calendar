@@ -18,8 +18,8 @@ services:
 
   api:
     build:
-      context: ./GameEventApi
-      dockerfile: GameEventApi/Dockerfile
+      context: .
+      dockerfile: Dockerfile
     environment:
       ASPNETCORE_HTTP_PORTS: "8080"
       ConnectionStrings__Default: "Host=db;Port=5432;Database=gameevent;Username=gameevent;Password=gameevent"
