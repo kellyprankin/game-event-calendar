@@ -11,6 +11,7 @@ builder.Services.AddValidation();
 builder.Services.AddProblemDetails();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<RegistrationService>();
+builder.Services.AddSingleton<RegistrationLinks>();
 builder.Services.Configure<StoreOptions>(builder.Configuration.GetSection(StoreOptions.Section));
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"))

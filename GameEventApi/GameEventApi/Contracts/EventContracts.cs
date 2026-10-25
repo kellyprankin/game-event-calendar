@@ -26,7 +26,8 @@ public record EventDto(
     int Capacity,
     int RegisteredCount,
     int SeatsLeft,
-    int MinPlayers)
+    int MinPlayers,
+    string? RegistrationUrl = null) // Only filled in on the single-event response.
 {
     public static EventDto From(Event e, GameTemplate t)
     {

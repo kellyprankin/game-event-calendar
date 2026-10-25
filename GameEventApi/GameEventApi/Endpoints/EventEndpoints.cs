@@ -18,6 +18,7 @@ public static class EventEndpoints
         events.MapGet("/{id:guid}", GetEvent);
         events.MapPost("/", CreateEvent);
         events.MapGet("/{id:guid}/invite.ics", GetInvite);
+        events.MapGet("/{id:guid}/qr.png", GetQr);
 
         return api;
     }
@@ -54,11 +55,31 @@ public static class EventEndpoints
         return TypedResults.Ok(events.Select(e => EventDto.From(e, e.GameTemplate!)).ToList());
     }
 
-    static async Task<Results<Ok<EventDto>, NotFound>> GetEvent(Guid id, AppDbContext db, CancellationToken ct)
+    static async Task<Results<Ok<EventDto>, NotFound>> GetEvent(
+        Guid id, HttpRequest request, AppDbContext db, RegistrationLinks links, CancellationToken ct)
     {
         var ev = await db.Events.AsNoTracking().Include(e => e.GameTemplate)
             .FirstOrDefaultAsync(e => e.Id == id, ct);
-        return ev is null ? TypedResults.NotFound() : TypedResults.Ok(EventDto.From(ev, ev.GameTemplate!));
+        if (ev is null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        return TypedResults.Ok(EventDto.From(ev, ev.GameTemplate!) with
+        {
+            RegistrationUrl = links.RegistrationUrl(request, ev.Id),
+        });
+    }
+
+    static async Task<Results<FileContentHttpResult, NotFound>> GetQr(
+        Guid id, HttpRequest request, AppDbContext db, RegistrationLinks links, CancellationToken ct)
+    {
+        if (!await db.Events.AnyAsync(e => e.Id == id, ct))
+        {
+            return TypedResults.NotFound();
+        }
+
+        return TypedResults.File(RegistrationLinks.QrPng(links.RegistrationUrl(request, id)), "image/png");
     }
 
     static async Task<Results<Created<EventDto>, ValidationProblem>> CreateEvent(
