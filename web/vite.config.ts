@@ -17,7 +17,7 @@ export default defineConfig({
   },
   build: {
     // The API serves the built app from wwwroot, so everything shares one origin.
-    outDir: '../GameEventApi/GameEventApi/wwwroot',
+    outDir: '../api/GameEventApi/wwwroot',
     emptyOutDir: true,
   },
 })

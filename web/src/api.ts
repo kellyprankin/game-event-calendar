@@ -1,4 +1,4 @@
-// Types mirror the API's DTOs (GameEventApi/Contracts).
+// Types mirror the API's DTOs (api/GameEventApi/Contracts).
 
 export interface GameTemplate {
   id: string

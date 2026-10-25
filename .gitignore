@@ -485,4 +485,4 @@ $RECYCLE.BIN/
 Senior_Software_Engineer_*Take-Home.md
 
 # Built Vue app (output of web/ npm run build)
-GameEventApi/GameEventApi/wwwroot/
+api/GameEventApi/wwwroot/

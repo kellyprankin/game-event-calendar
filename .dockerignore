@@ -7,5 +7,5 @@
 **/dist
 **/wwwroot
 **/*.user
-GameEventApi/GameEventApi.Tests
+api/GameEventApi.Tests
 docs
