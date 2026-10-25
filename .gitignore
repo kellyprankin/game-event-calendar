@@ -480,3 +480,6 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Take-home instructions (kept local, not published)
+Senior_Software_Engineer_*Take-Home.md
