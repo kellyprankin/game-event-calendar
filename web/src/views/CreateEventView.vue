@@ -10,6 +10,8 @@ const name = ref('')
 const templateId = ref('')
 const format = ref('')
 const startsAt = ref(toLocalInput(tomorrowAt(18)))
+// Greys out past dates in the picker; submit() and the API still check, since typed values bypass it.
+const minStartsAt = toLocalInput(new Date())
 const capacity = ref<number | null>(null)
 
 const submitting = ref(false)
@@ -37,9 +39,11 @@ async function submit() {
   error.value = ''
   fieldErrors.value = {}
   const start = new Date(startsAt.value)
-  if (Number.isNaN(start.getTime())) {
+  if (Number.isNaN(start.getTime()) || start <= new Date()) {
     error.value = 'Please fix the highlighted fields.'
-    fieldErrors.value = { StartsAt: ['Choose a date and start time.'] }
+    fieldErrors.value = {
+      StartsAt: [Number.isNaN(start.getTime()) ? 'Choose a date and start time.' : 'Start time must be in the future.'],
+    }
     return
   }
 
@@ -123,6 +127,7 @@ function toLocalInput(d: Date) {
       <input
         v-model="startsAt"
         type="datetime-local"
+        :min="minStartsAt"
         required
         :aria-invalid="!!fieldError('startsAt')"
         aria-describedby="starts-hint starts-error"
