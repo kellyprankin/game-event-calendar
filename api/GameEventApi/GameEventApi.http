@@ -1,6 +1,42 @@
-@GameEventApi_HostAddress = http://localhost:5198
+@host = http://localhost:5198
 
-GET {{GameEventApi_HostAddress}}/weatherforecast/
-Accept: application/json
+GET {{host}}/api/templates
 
 ###
+
+POST {{host}}/api/events
+Content-Type: application/json
+
+{
+  "name": "Friday Night Magic",
+  "gameTemplateId": "mtg",
+  "format": "Draft",
+  "startsAt": "2027-01-15T18:00:00-08:00",
+  "capacity": 16
+}
+
+###
+
+GET {{host}}/api/events
+
+###
+
+# Replace the id with one returned by the POST above.
+@eventId = 00000000-0000-0000-0000-000000000000
+
+GET {{host}}/api/events/{{eventId}}
+
+###
+
+POST {{host}}/api/events/{{eventId}}/registrations
+Content-Type: application/json
+
+{ "name": "Richard Garfield" }
+
+###
+
+GET {{host}}/api/events/{{eventId}}/invite.ics
+
+###
+
+GET {{host}}/api/events/{{eventId}}/qr.png

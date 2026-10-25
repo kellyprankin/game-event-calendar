@@ -5,8 +5,6 @@ public class StoreOptions
 {
     public const string Section = "Store";
 
-    public string Name { get; set; } = "";
-
     /// <summary>Street address used as the location on calendar invites.</summary>
     public string Location { get; set; } = "";
 }
