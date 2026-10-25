@@ -41,6 +41,10 @@ api.MapRegistrationEndpoints();
 
 // Unknown /api paths stay 404s; any other path loads the Vue app, which handles routing.
 api.MapFallback(() => TypedResults.NotFound());
-app.MapFallbackToFile("index.html");
+// no-cache so browsers always pick up the latest build; the hashed asset files can still be cached.
+app.MapFallbackToFile("index.html", new StaticFileOptions
+{
+    OnPrepareResponse = ctx => ctx.Context.Response.Headers.CacheControl = "no-cache",
+});
 
 app.Run();
